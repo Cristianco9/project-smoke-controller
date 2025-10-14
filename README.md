@@ -93,59 +93,50 @@ resolver problemas de la vida real.
 ## 👨🏻‍💻👩🏻‍💻 Desarrollo del proyecto
 
 ### Código en Bloques:
-  ![Blocs](images/code.png)
+  ![Blocs](images/codigo-simple-digital.png)
 
 ### Código en JavaScript:
 ```JavaScript
-let Gas = 0
-pins.digitalWritePin(DigitalPin.P5, 0)
-basic.forever(function on_forever() {
-    
-    Gas = pins.digitalReadPin(DigitalPin.P0)
-    if (Gas == 0) {
-        pins.digitalWritePin(DigitalPin.P7, 1)
-        pins.digitalWritePin(DigitalPin.P5, 1)
-        basic.pause(500)
-        pins.digitalWritePin(DigitalPin.P7, 0)
-        pins.digitalWritePin(DigitalPin.P5, 0)
-        basic.pause(500)
-        pins.digitalWritePin(DigitalPin.P6, 0)
-        basic.showString("'Peligro Humo!'")
+let gas = 0
+basic.forever(function () {
+    gas = pins.digitalReadPin(DigitalPin.P6)
+    if (gas == 0) {
+        basic.showString("Peligro Humo")
+        music.playTone(880, music.beat(BeatFraction.Eighth))
+        basic.pause(200)
     } else {
-        pins.digitalWritePin(DigitalPin.P7, 0)
-        pins.digitalWritePin(DigitalPin.P5, 0)
-        pins.digitalWritePin(DigitalPin.P6, 1)
-        basic.showString("'Seguro!'")
+        basic.showString("Aire Seguro")
+        music.stopAllSounds()
+        basic.pause(500)
     }
-    
 })
 ```
 
-### Código en Python:
-```Python
-Gas = 0
-pins.digital_write_pin(DigitalPin.P5, 0)
 
-def on_forever():
-    global Gas
-    Gas = pins.digital_read_pin(DigitalPin.P0)
-    if Gas == 0:
-        pins.digital_write_pin(DigitalPin.P7, 1)
-        pins.digital_write_pin(DigitalPin.P5, 1)
-        basic.pause(500)
-        pins.digital_write_pin(DigitalPin.P7, 0)
-        pins.digital_write_pin(DigitalPin.P5, 0)
-        basic.pause(500)
-        pins.digital_write_pin(DigitalPin.P6, 0)
-        basic.show_string("'Peligro Humo!'")
-    else:
-        pins.digital_write_pin(DigitalPin.P7, 0)
-        pins.digital_write_pin(DigitalPin.P5, 0)
-        pins.digital_write_pin(DigitalPin.P6, 1)
-        basic.show_string("'Seguro!'")
-basic.forever(on_forever)
+### Código para probar el sensor MQ-2 en el pin analógico:
+```JavaScript
+basic.forever(function () {
+    let v = pins.analogReadPin(AnalogPin.P0) // valor 0..1023
+    basic.showNumber(v)
+    basic.pause(300)
+})
+
 ```
+  ![Blocs](images/codigo-sensor-analog.png)
 
+  ### Código para probar el sensor MQ-2 en el pin digital:
+```JavaScript
+let d = 0
+basic.forever(function () {
+    // lee el pin digital
+    d = pins.digitalReadPin(DigitalPin.P6)
+    basic.showNumber(d)
+    basic.pause(300)
+})
+
+
+```
+  ![Blocs](images/codigo-sensor-digital.png)
 
 ---
 
