@@ -12,39 +12,10 @@ resolver problemas de la vida real.
 
 ---
 
-## 📌 Partes requeridas
-
-- **BBC micro:bit**
-  ![Micro:bit](images/microbit-bbc-v2.jpg)
-
-- **Sensor de humo MQ-2**  
-  ![Sensor MQ-2](images/sensor-mq-2.png)
-
-- **Protoboard**  
-  ![Protoboard](images/protoboard.png)
-
-- **Jumpers (cables de conexión)**  
-  ![Jumpers](images/jumpers.png)
-
-- **Zumbador (buzzer)**  
-  ![Buzzer](images/buzzer.png)
-
-- **LED rojo (opcional)**  
-  ![LED rojo](images/led-rojo.png)
-
-  - **LED verde (opcional)**  
-  ![LED rojo](images/led-verde.png)
-
-- **Fuente de energía (USB o batería 5V)**  
-  ![Fuente](images/cable-usb.png)
-
----
-
 ## 🎯 Funcionalidades principales
 
 - 🔥 **Detección de humo/gas** mediante el sensor MQ-2.  
 - 🚨 **Alarma sonora** con un buzzer al detectar humo.  
-- 💡 **Indicador visual** en la matriz LED de la micro:bit y con LED externo (opcional).  
 - 📊 **Lectura de valores analógicos** para calibrar la sensibilidad del sensor.  
 
 ---
@@ -54,7 +25,6 @@ resolver problemas de la vida real.
 - Conectar y programar un **sensor externo** en la micro:bit.  
 - Diferenciar entre **lectura digital (ON/OFF)** y **lectura analógica (valores continuos)**.  
 - Usar **condicionales** para activar alarmas según un umbral definido.  
-- Representar información en la **matriz LED** de la micro:bit.  
 - La importancia de los **sensores en la seguridad** de hogares y espacios públicos.  
 
 ---
@@ -64,11 +34,9 @@ resolver problemas de la vida real.
 1. El **sensor MQ-2** mide la concentración de humo o gas en el aire.  
 2. La micro:bit lee el valor de salida del sensor.  
 3. Si el valor es mayor al **umbral definido**:  
-   - Se activa el buzzer con una alarma sonora.  
-   - Se enciende el LED rojo (opcional).  
+   - Se activa el buzzer con una alarma sonora. 
    - La micro:bit muestra un ícono de alerta 🚨 en su pantalla LED.  
 4. Si no hay humo, el buzzer permanece apagado y se muestra un ícono de ✅ indicando seguridad.
-   - Se enciende el LED verde (opcional).
 
 ---
 
@@ -92,51 +60,55 @@ resolver problemas de la vida real.
 
 ## 👨🏻‍💻👩🏻‍💻 Desarrollo del proyecto
 
-### Código en Bloques:
-  ![Blocs](images/codigo-simple-digital.png)
+## Detector
 
-### Código en JavaScript:
+### Código en Bloques:
+  ![Blocs](images/codigo-detector.png)
+
+### Código en JavaScript: 
 ```JavaScript
-let gas = 0
+let lectura = 0
+let valorMapeado = 0
+
+radio.setGroup(1)
+
 basic.forever(function () {
-    gas = pins.digitalReadPin(DigitalPin.P6)
-    if (gas == 0) {
-        basic.showString("Peligro Humo")
-        music.playTone(880, music.beat(BeatFraction.Eighth))
-        basic.pause(200)
+    lectura = pins.analogReadPin(AnalogPin.P2)
+    valorMapeado = pins.map(lectura, 0, 1023, 0, 1023)
+
+    if (valorMapeado > 220) {
+        basic.showIcon(IconNames.No) // ❌
+        radio.sendNumber(1)
     } else {
-        basic.showString("Aire Seguro")
+        basic.showIcon(IconNames.Yes) // ✔️
+        radio.sendNumber(0)
+    }
+
+    basic.pause(100) // cada 0.1 s → 10 veces por segundo
+})
+```
+
+## Alarma
+
+### Código en Bloques:
+  ![Blocs](images/codigo-alarma.png)
+
+### Código en JavaScript: 
+```JavaScript
+let gasDetectado = 0
+radio.setGroup(1)
+
+radio.onReceivedNumber(function (receivedNumber) {
+    gasDetectado = receivedNumber
+    if (gasDetectado == 1) {
+        basic.showIcon(IconNames.Skull) // ☠️ o puedes usar otro icono
+        music.startMelody(music.builtInMelody(Melodies.PowerDown), MelodyOptions.Once)
+    } else {
+        basic.showIcon(IconNames.Happy)
         music.stopAllSounds()
-        basic.pause(500)
     }
 })
 ```
-
-
-### Código para probar el sensor MQ-2 en el pin analógico:
-```JavaScript
-basic.forever(function () {
-    let v = pins.analogReadPin(AnalogPin.P0) // valor 0..1023
-    basic.showNumber(v)
-    basic.pause(300)
-})
-
-```
-  ![Blocs](images/codigo-sensor-analog.png)
-
-  ### Código para probar el sensor MQ-2 en el pin digital:
-```JavaScript
-let d = 0
-basic.forever(function () {
-    // lee el pin digital
-    d = pins.digitalReadPin(DigitalPin.P6)
-    basic.showNumber(d)
-    basic.pause(300)
-})
-
-
-```
-  ![Blocs](images/codigo-sensor-digital.png)
 
 ---
 
